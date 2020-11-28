@@ -1,0 +1,128 @@
+import os
+import time
+ 
+os.system('sudo /home/pi/PiBits/ServoBlaster/user/servod --p1pins=7,11,12,18')  #activate GPIO-4,GPIO-17,GPIO-18,GPIO-24
+  
+gpio_pwm=[7,11,12,18]
+forward_pwm=[7,18]
+right_pwm=[7,12]
+left_pwm=[11,18]
+ 
+speed=[1540,1550,1560,1570]
+forward=[1580,1590,1600,1610,1620]
+right=[1800,1900]
+left=[1600,1600]
+
+def elevation():
+    for a in speed:
+        for x in gpio_pwm:
+            os.system("echo P1-"+ str(x) +"="+ str(a) +"us > /dev/servoblaster")
+            print("echo P1-"+ str(x) +"="+ str(a) +"us > /dev/servoblaster")
+        time.sleep(4)
+ 
+ 
+def move_forward():
+    for a in forward:
+        for x in forward_pwm:
+            os.system("echo P1-"+ str(x) +"="+ str(a) +"us > /dev/servoblaster")
+            print("echo P1-"+ str(x) +"="+ str(a) +"us > /dev/servoblaster")
+            os.system("echo P1-11=1570us > /dev/servoblaster")
+            print("echo P1-11=1570us > /dev/servoblaster")
+            os.system("echo P1-12=1570us > /dev/servoblaster")
+            print("echo P1-12=1570us > /dev/servoblaster")
+        time.sleep(4)
+ 
+def turn_left():
+    for a in left:
+ 
+        for x in left_pwm:
+            os.system("echo P1-"+ str(x) +"="+ str(a) +"us > /dev/servoblaster")
+            print("echo P1-"+ str(x) +"="+ str(a) +"us > /dev/servoblaster")
+        time.sleep(8)
+ 
+def turn_right():
+    for a in right:
+        for x in right_pwm:
+            os.system("echo P1-"+ str(x) +"="+ str(a) +"us > /dev/servoblaster")
+            print("echo P1-"+ str(x) +"="+ str(a) +"us > /dev/servoblaster")
+        time.sleep(8)
+ 
+def calibration():
+    for x in gpio_pwm:
+        os.system("echo P1-"+ str(x) +"=0> /dev/servoblaster")     # Max value of motors
+ 
+        print("echo P1-"+ str(x) +"=0> /dev/servoblaster")
+    time.sleep(1)
+
+    print("Disconnect the battery and press Enter")
+    inp = input()
+    if inp == '':
+        for x in gpio_pwm:
+            os.system("echo P1-"+ str(x) +"=2450us> /dev/servoblaster")     # Max value of motors
+ 
+            print("echo P1-"+ str(x) +"=2450us> /dev/servoblaster")
+ 
+        print("Connect the battery NOW.. you will here two beeps, then wait for a gradual falling tone then press Enter")
+        inp = input()
+        if inp == '':
+            for x in gpio_pwm:
+                os.system("echo P1-"+ str(x) +"=1500us> /dev/servoblaster") # Min value of motors
+                print("echo P1-"+ str(x) +"=1500us> /dev/servoblaster")
+ 
+            print("wait ring tone for a few secons")
+            time.sleep(6)
+            print("Please, wait again")
+            time.sleep(4)
+            print("Please, wait again for arming")
+            for x in gpio_pwm:
+                os.system("echo P1-"+ str(x) +"=0> /dev/servoblaster")
+                print("echo P1-"+ str(x) +"=0> /dev/servoblaster")
+ 
+            time.sleep(2)
+            print("Arming ESC now ...")
+            for x in gpio_pwm:
+                os.system("echo P1-"+ str(x) +"=1500us> /dev/servoblaster")# Min value of motors
+ 
+                print("echo P1-"+ str(x) +"=1500us> /dev/servoblaster")
+ 
+            time.sleep(1)
+            control_motors()
+ 
+def control_motors():
+    elevation()
+    time.sleep(16)
+ 
+ 
+def stop():
+    for x in gpio_pwm:
+                os.system("echo P1-"+ str(x) +"=0> /dev/servoblaster")
+                print("echo P1-"+ str(x) +"=0> /dev/servoblaster")
+ 
+    os.system('sudo killall /home/pi/PiBits/ServoBlaster/user/servod')
+ 
+ 
+#This is the start of the program actually, to start the function it needs to be initialized before calling...
+print ("c OR control OR stop")
+ 
+inp = input()
+ 
+if inp == "c":
+    calibration()
+elif inp == "control":
+    control_motors()
+elif inp == "stop":
+    stop()
+else :
+    print (" not following the things ")
+ 
+ 
+"""
+    for a in speed:
+ 
+        for x in gpio_pwm:
+            os.system("echo P1-"+ str(x) +"="+ str(a) +" > /dev/servoblaster")
+ 
+            print("echo P1-"+ str(x) +"="+ str(a) +" > /dev/servoblaster")
+        time.sleep(8)
+ 
+"""
